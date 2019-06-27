@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd">
+	
+	<context:annotation-config />
+  
+  	<!-- Helper utility used by domain to publish event using Eventbus -->
+	<bean class="com.trackorder.domain.model.DomainEventPublisher"/>	
+	
+	<bean id="eventBus" class="notification.system.eventbus.SpringEventBus" />		
+
+	<!-- Eventstore where all events has to be persisted -->	
+	<bean id="eventStore" class="com.trackorder.infrastructure.eventstore.InMemoryEventStore" />	
+	
+	<int:service-activator input-channel="domainEventsChannel" ref="eventStore" />
+	
+	<!-- Publish subscriber channel used by EventBus -->
+  	<int:publish-subscribe-channel id="domainEventsChannel"/>
+	
+	<import resource="order-payment-integration-flow.xml"/>
+</beans>
